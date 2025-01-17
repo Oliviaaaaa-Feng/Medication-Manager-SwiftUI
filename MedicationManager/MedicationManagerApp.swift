@@ -11,7 +11,8 @@ import SwiftUI
 struct MedicationManagerApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            PatientListView()
+            //ContentView()
         }
     }
 }

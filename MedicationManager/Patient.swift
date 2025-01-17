@@ -5,8 +5,11 @@
 //  Created by Olivia on 2025/1/9.
 //
 import Foundation
+@Observable
 
-struct Patient {
+// Represents a patient with detailed information
+class Patient: ObservableObject, Identifiable{
+    var id: UUID { medicalRecordNumber }
     let medicalRecordNumber: UUID
     let firstName: String
     let lastName: String
@@ -15,9 +18,14 @@ struct Patient {
     var weight: Double
     var bloodType: BloodType?
     var medications: [Medication]
+    var age: Int {
+        let currentYear = Calendar.current.component(.year, from: Date())
+        let birthYear = Calendar.current.component(.year, from: dateOfBirth)
+        return currentYear - birthYear
+    }
     
     // Initializer
-    init(firstName: String, lastName: String, dateOfBirth: Date, height: Double, weight: Double, bloodType: BloodType? = nil) {
+    init(firstName: String, lastName: String, dateOfBirth: Date, height: Double, weight: Double, bloodType: BloodType? = nil, medications: [Medication] = []) {
         self.medicalRecordNumber = UUID()
         self.firstName = firstName
         self.lastName = lastName
@@ -25,13 +33,20 @@ struct Patient {
         self.height = height
         self.weight = weight
         self.bloodType = bloodType
-        self.medications = []
+        self.medications = medications
     }
     
     // Patient’s full name and age
     func nameAndAge() -> String {
         let age = Calendar.current.dateComponents([.year], from: dateOfBirth, to: Date()).year ?? 0
         return "\(lastName), \(firstName) (\(age) years old)"
+    }
+    
+    // Formatted date of birth
+    func formattedDateOfBirth() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM-dd-yyyy"
+        return formatter.string(from: dateOfBirth)
     }
     
     // A list of Medications the Patient is currently taking
@@ -50,7 +65,7 @@ struct Patient {
     }
     
     // Prescribe a new Medication
-    mutating func prescribeNewMedication(_ newMedication: Medication) throws {
+    func prescribeNewMedication(_ newMedication: Medication) throws {
         let isDuplicate = medications.contains { medication in
             let endDate = Calendar.current.date(byAdding: .day, value: medication.duration, to: medication.datePrescribed)!
             return medication.name == newMedication.name && endDate > Date()

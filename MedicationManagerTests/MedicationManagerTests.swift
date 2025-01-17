@@ -9,7 +9,7 @@ import Testing
 import Foundation
 @testable import MedicationManager
 
-struct TestTests {
+struct MedicationManagerTests {
     var patient: Patient!
     
     // Initialize
